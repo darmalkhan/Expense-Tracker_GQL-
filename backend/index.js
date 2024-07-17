@@ -24,7 +24,7 @@ const httpServer = http.createServer(app);
 const MongoDBStore = connectMongo(session);
 
 const store = new MongoDBStore({
-  uri: process.env.MONGOD,
+  uri: process.env.MONGO_URL,
   collection: "sessions",
 });
 
@@ -36,7 +36,7 @@ app.use(
     resave: false,
     saveUninitialized: false,
     cookie: {
-      maxAge: 1000 * 60 * 60 * 24 * 7,
+      maxAge: 1000 * 60 * 60 * 24 * 7, // 1 week
       httpOnly: true,
     },
     store: store,
@@ -58,17 +58,14 @@ app.use(
   "/",
   cors({
     origin: "https://localhost:3000",
-    Credential: true,
+    credentials: true, // Correct case
   }),
   express.json(),
-  // expressMiddleware accepts the same arguments:
-  // an Apollo Server instance and optional configuration options
   expressMiddleware(server, {
     context: async ({ req, res }) => buildContext({ req, res }),
   })
 );
 
-// Modified server startup
-await new Promise((resolve) => httpServer.listen({ port: 4000 }, resolve));
 await connectDB();
+await new Promise((resolve) => httpServer.listen({ port: 4000 }, resolve));
 console.log(`🚀 Server ready at express http://localhost:4000/`);
