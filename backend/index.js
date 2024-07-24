@@ -10,11 +10,11 @@ import { expressMiddleware } from "@apollo/server/express4";
 import { ApolloServerPluginDrainHttpServer } from "@apollo/server/plugin/drainHttpServer";
 import { buildContext } from "graphql-passport";
 
-import mergeResolvers from "./resolvers/index.js";
-import mergeTypeDefs from "./typeDefs/index.js";
 import dotenv from "dotenv";
 import { connectDB } from "./db/connectDB.js";
 import { configurePassport } from "./passport/passport.config.js";
+import mergedTypeDefs from "./typeDefs/index.js";
+import mergedResolvers from "./resolvers/index.js";
 
 dotenv.config();
 configurePassport();
@@ -47,18 +47,18 @@ app.use(passport.initialize());
 app.use(passport.session());
 
 const server = new ApolloServer({
-  typeDefs: mergeTypeDefs,
-  resolvers: mergeResolvers,
+  typeDefs: mergedTypeDefs,
+  resolvers: mergedResolvers,
   plugins: [ApolloServerPluginDrainHttpServer({ httpServer })],
 });
 
 await server.start();
 
 app.use(
-  "/",
+  "/graphql",
   cors({
-    origin: "https://localhost:3000",
-    credentials: true, // Correct case
+    origin: ["http://localhost:3000", "https://localhost:3000"], // Allow both http and https
+    credentials: true,
   }),
   express.json(),
   expressMiddleware(server, {
@@ -68,4 +68,4 @@ app.use(
 
 await connectDB();
 await new Promise((resolve) => httpServer.listen({ port: 4000 }, resolve));
-console.log(`🚀 Server ready at express http://localhost:4000/`);
+console.log(`🚀 Server ready at express http://localhost:4000/graphql`);

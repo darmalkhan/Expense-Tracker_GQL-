@@ -1,43 +1,51 @@
 const transactionTypeDef = `#graphql
-type Transaction {
+  type Transaction {
     _id: ID!
-    userId: String!
+    userId: ID!
     description: String!
     paymentType: String!
-    catagory: String!
-    amount: String!
+    category: String!
+    amount: Float!
     location: String
     date: String!
-}
+    user: User!
+  }
 
-type Query {
-    transaction: [Transaction!]
-    transaction(transactioId:ID!): Transaction
-}
+  type Query {
+    transactions: [Transaction!]
+    transaction(transactionId:ID!): Transaction
+    categoryStatistics: [CategoryStatistics!]
+  }
 
-type Mutation {
-    createTransaction(inpput: createTransactionInput!): Transaction!
-    updateTransaction(inpput: updateTransactionInput!): Transaction!
-    deleteTransaction(transactionId: ID!): Transaction!
-}
+  type Mutation {
+    createTransaction(input: CreateTransactionInput!): Transaction!
+    updateTransaction(input: UpdateTransactionInput!): Transaction!
+    deleteTransaction(transactionId:ID!): Transaction!
+  }
 
-type createTransactionInput {
+  type CategoryStatistics {
+    category: String!
+    totalAmount: Float!
+  }
+
+  input CreateTransactionInput {
     description: String!
     paymentType: String!
-    catagory: String!
-    amount: String!
-    location: String
+    category: String!
+    amount: Float!
     date: String!
-}
-type updateTransactionInput {
-    transactioId: ID!
+    location: String
+  }
+
+  input UpdateTransactionInput {
+    transactionId: ID!
     description: String
     paymentType: String
-    catagory: String
-    amount: String
+    category: String
+    amount: Float
     location: String
     date: String
-}
+  }
 `;
 
 export default transactionTypeDef;
